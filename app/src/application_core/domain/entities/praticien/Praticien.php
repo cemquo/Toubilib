@@ -28,6 +28,50 @@ class Praticien
         $this->motif_visite = $motif_visite;
     }
 
-    
+    /* GETTERS */
 
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getNom(): string
+    {
+        return $this->nom;
+    }
+
+    public function getPrenom(): string
+    {
+        return $this->prenom;
+    }
+
+    public function getSpecialite(): string
+    {
+        return $this->specialite;
+    }
+
+    public function getVille(): string
+    {
+        return $this->ville;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getTelephone(): string
+    {
+        return $this->telephone;
+    }
+
+    public function getMotifVisite(): string
+    {
+        return $this->motif_visite;
+    }
+
+    public function getMoyenPayement(): string
+    {
+        return $this->moyen_payement;
+    }
 }
