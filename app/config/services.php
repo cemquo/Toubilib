@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-use toubilib\infra\repositories\PraticienRepository;
-use toubilib\infra\repositories\PraticienRepositoryInterface;
+use toubilib\core\application\ports\api\ServicePraticienInterface;
+use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\application\usecases\ServicePraticien;
-use toubilib\core\application\usecases\ServicePraticienInterface;
+use toubilib\infra\repositories\PraticienRepository;
 
 return [
     PDO::class => function($c) {

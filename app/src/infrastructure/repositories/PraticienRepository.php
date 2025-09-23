@@ -2,6 +2,7 @@
 
 namespace toubilib\infra\repositories;
 
+use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\domain\entities\praticien\Praticien;
 
 class PraticienRepository implements PraticienRepositoryInterface

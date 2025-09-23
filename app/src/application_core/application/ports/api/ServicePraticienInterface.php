@@ -1,6 +1,6 @@
 <?php
 
-namespace toubilib\core\application\usecases;
+namespace toubilib\core\application\ports\api;
 
 interface ServicePraticienInterface
 {

@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use toubilib\core\presentation\actions\ListerPraticiensAction;
-use toubilib\core\application\usecases\ServicePraticienInterface;
+use toubilib\api\actions\ListerPraticiensAction;
+use toubilib\core\application\ports\api\ServicePraticienInterface;
 
 return [
     ListerPraticiensAction::class => function($c) {

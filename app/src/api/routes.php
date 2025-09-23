@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Slim\App;
-use toubilib\core\presentation\actions\ListerPraticiensAction;
+use toubilib\api\actions\ListerPraticiensAction;
 
 
 return function( App $app):App {

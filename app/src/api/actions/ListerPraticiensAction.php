@@ -1,6 +1,6 @@
 <?php
 
-namespace toubilib\core\presentation\actions;
+namespace toubilib\api\actions;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

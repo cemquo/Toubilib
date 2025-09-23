@@ -2,8 +2,9 @@
 
 namespace toubilib\core\application\usecases;
 
-use toubilib\core\application\dto\PraticienDTO;
-use toubilib\infra\repositories\PraticienRepositoryInterface;
+use toubilib\core\application\ports\api\dtos\PraticienDTO;
+use toubilib\core\application\ports\api\ServicePraticienInterface;
+use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 
 class ServicePraticien implements ServicePraticienInterface
 {
