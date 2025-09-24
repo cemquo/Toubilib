@@ -24,16 +24,16 @@ class ListerRdvAction
             isset($queryParams['debutPeriode']) && !empty($queryParams['debutPeriode']) &&
             isset($queryParams['finPeriode']) && !empty($queryParams['finPeriode'])) {
             
-            return $this->getRdvPraticienPeriode($request, $response, $queryParams);
+            return $this->serviceRdv->getRdvPraticienPeriode($request, $response, $queryParams);
         }
         
         // Si on a seulement un praticien_id, on peut afficher autre chose
         if (isset($queryParams['praticien']) && !empty($queryParams['praticien'])) {
-            return $this->getRdvPraticien($request, $response, $queryParams);
+            return $this->serviceRdv->getRdvPraticien($request, $response, $queryParams);
         }
         
         // Sinon, comportement par défaut (liste générale, autre logique...)
-        return $this->getRdvGeneral($request, $response, $queryParams);
+        return $this->serviceRdv->getRdvGeneral($request, $response, $queryParams);
     }
     
 }
