@@ -34,4 +34,12 @@ return [
     ServicePraticienInterface::class => function($c) {
         return new ServicePraticien($c->get(PraticienRepositoryInterface::class));
     },
+
+    RdvRepositoryInterface::class => function($c) {
+        return new RdvRepository($c->get('pdo.rdv'));
+    },
+
+    ServiceRdvInterface::class => function($c) {
+        return new ServiceRdv($c->get(RdvRepositoryInterface::class));
+    },
 ];
