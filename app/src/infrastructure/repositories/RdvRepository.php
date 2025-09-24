@@ -2,6 +2,7 @@
 
 namespace toubilib\infra\repositories;
 
+use DateTime;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
 use toubilib\core\domain\entities\rdv\Rdv;
 

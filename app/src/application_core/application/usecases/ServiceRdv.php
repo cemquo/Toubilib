@@ -2,6 +2,10 @@
 
 namespace toubilib\core\application\usecases;
 
+use DateTime;
+use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use toubilib\core\application\ports\api\dtos\RdvDTO;
 use toubilib\core\application\ports\api\ServiceRdvInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
