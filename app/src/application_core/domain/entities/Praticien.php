@@ -1,6 +1,6 @@
 <?php
 
-namespace toubilib\core\domain\entities\praticien;
+namespace toubilib\core\domain\entities;
 
 use Ramsey\Uuid\Uuid;
 
@@ -13,12 +13,12 @@ class Praticien
     private string $ville;
     private string $email;
     private string $telephone;
-    private string $motif_visite;
-    private string $moyen_payement;
+    private array $motif_visite;
+    private array $moyen_payement;
 
-    public function __construct(string $nom, string $prenom, string $specialite, string $ville, string $email, string $telephone, string $motif_visite, string $moyen_payement)
+    public function __construct(string $id, string $nom, string $prenom, string $specialite, string $ville, string $email, string $telephone="", array $motif_visite=[], array $moyen_payement=[])
     {
-        $this->id = Uuid::uuid4()->toString();
+        $this->id = $id;
         $this->nom = $nom;
         $this->prenom = $prenom;
         $this->specialite = $specialite;
@@ -26,6 +26,7 @@ class Praticien
         $this->email = $email;
         $this->telephone = $telephone;
         $this->motif_visite = $motif_visite;
+        $this->moyen_payement = $moyen_payement;
     }
 
     /* GETTERS */
@@ -65,12 +66,12 @@ class Praticien
         return $this->telephone;
     }
 
-    public function getMotifVisite(): string
+    public function getMotifVisite(): array
     {
         return $this->motif_visite;
     }
 
-    public function getMoyenPayement(): string
+    public function getMoyenPayement(): array
     {
         return $this->moyen_payement;
     }
