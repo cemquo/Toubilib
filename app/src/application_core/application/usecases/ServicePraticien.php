@@ -30,4 +30,22 @@ class ServicePraticien implements ServicePraticienInterface
             );
         }, $praticiens);
     }
+
+    public function afficherPraticien(string $id): PraticienDTO
+    {
+        $praticien = $this->praticienRepository->get($id);
+
+        return new PraticienDTO(
+            $praticien->getId(),
+            $praticien->getNom(),
+            $praticien->getPrenom(),
+            $praticien->getSpecialite(),
+            $praticien->getVille(),
+            $praticien->getEmail(),
+            $praticien->getTelephone(),
+            $praticien->getMotifVisite(),
+            $praticien->getMoyenPayement()
+        );
+
+    }
 }
