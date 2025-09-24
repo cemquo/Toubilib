@@ -9,6 +9,7 @@ use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterf
 use toubilib\core\application\usecases\ServicePraticien;
 use toubilib\core\application\usecases\ServiceRdv;
 use toubilib\infra\repositories\PraticienRepository;
+use toubilib\infra\repositories\RdvRepository;
 
 return [
 
@@ -21,8 +22,17 @@ return [
         );
     },
 
-    'pdo.rdv' => function(ContainerInterface $c): PDO {
+    'pdo.pat' => function(ContainerInterface $c): PDO {
         $db = $c->get('settings')['db']['pat'];
+        return new PDO(
+            "{$db['driver']}:host={$db['host']};dbname={$db['dbname']}",
+            $db['user'],
+            $db['password']
+        );
+    },
+
+    'pdo.rdv' => function(ContainerInterface $c): PDO {
+        $db = $c->get('settings')['db']['rdv'];
         return new PDO(
             "{$db['driver']}:host={$db['host']};dbname={$db['dbname']}",
             $db['user'],
