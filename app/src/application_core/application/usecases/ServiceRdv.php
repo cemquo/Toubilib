@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use toubilib\core\application\ports\api\dtos\InputRendezVousDTO;
 use toubilib\core\application\ports\api\dtos\RdvDTO;
 use toubilib\core\application\ports\api\ServiceRdvInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
@@ -245,6 +246,11 @@ class ServiceRdv implements ServiceRdvInterface
     public function isValidUuid($uuid): bool
     {
         return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $uuid);
+    }
+
+    public function creerRendezVous(InputRendezVousDTO $dto)
+    {
+        $this->rdvRepository->create($dto);
     }
 
 }
