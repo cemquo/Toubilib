@@ -13,7 +13,7 @@ return function( App $app):App {
 
     $app->get('/praticien/{id}', AfficherPraticienAction::class);
 
-    $app->get('/rdv', ListerRdvAction::class);
+    $app->get('/praticien/{id}/rdv', ListerRdvAction::class);
 
     return $app;
 };

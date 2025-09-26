@@ -3,6 +3,7 @@
 namespace toubilib\core\application\usecases;
 
 use DateTime;
+use DateTimeZone;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -43,7 +44,7 @@ class ServiceRdv implements ServiceRdvInterface
     public function getRdvPraticienPeriode(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
     {
         try {
-            $praticienId = $queryParams['praticien'];
+            $praticienId = $request->getAttribute('id');
             $debutPeriode = $queryParams['debutPeriode'];
             $finPeriode = $queryParams['finPeriode'];
             
@@ -56,11 +57,18 @@ class ServiceRdv implements ServiceRdvInterface
                 ]));
                 return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
             }
+
             
-            // Conversion en objets DateTime
-            $dateDebut = new DateTime($debutPeriode . ' 00:00:00');
-            $dateFin = new DateTime($finPeriode . ' 23:59:59');
-            
+            // transforme la date locale en UTC
+            // Crée les dates en timezone locale (Europe/Paris)
+            $dateDebut = new \DateTime($debutPeriode . ' 00:00:00', new \DateTimeZone('Europe/Paris'));
+            $dateFin   = new \DateTime($finPeriode . ' 23:59:59', new \DateTimeZone('Europe/Paris'));
+
+            // Convertit en UTC pour la BDD
+            $dateDebut->setTimezone(new \DateTimeZone('UTC'));
+            $dateFin->setTimezone(new \DateTimeZone('UTC'));
+
+
             // Récupération des RDV
             $rdvs = $this->rdvRepository->getRdvByPraticienAndPeriod($praticienId, $dateDebut, $dateFin);
             
@@ -70,8 +78,8 @@ class ServiceRdv implements ServiceRdvInterface
                 'praticien_id' => $praticienId,
                 'data' => $rdvs,
                 'periode' => [
-                    'debut' => $dateDebut->format('Y-m-d'),
-                    'fin' => $dateFin->format('Y-m-d')
+                    'debut' => $dateDebut,
+                    'fin' => $dateFin
                 ],
                 'count' => count($rdvs)
             ];
@@ -88,9 +96,9 @@ class ServiceRdv implements ServiceRdvInterface
         }
     }
     
-    public function getRdvPraticien(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
+    public function getRdv(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
     {
-        $praticienId = $queryParams['praticien'];
+        $praticienId = $request->getAttribute('id');
         
         // Logique pour récupérer les RDV du praticien sans période (ex: prochains RDV)
         // Période par défaut : 30 prochains jours
@@ -111,37 +119,6 @@ class ServiceRdv implements ServiceRdvInterface
                 ],
                 'count' => count($rdvs),
                 'message' => 'Période par défaut : 30 prochains jours'
-            ];
-            
-            $response->getBody()->write(json_encode($result));
-            return $response->withHeader('Content-Type', 'application/json');
-            
-        } catch (Exception $e) {
-            $response->getBody()->write(json_encode([
-                'error' => 'Erreur serveur',
-                'message' => $e->getMessage()
-            ]));
-            return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
-        }
-    }
-    
-    public function getRdvGeneral(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
-    {
-        // Logique pour afficher autre chose (statistiques générales, RDV du jour, etc.)
-        try {
-            $today = new DateTime('today');
-            $tomorrow = new DateTime('tomorrow');
-            
-            // Exemple : RDV d'aujourd'hui pour tous les praticiens
-            $rdvsToday = $this->rdvRepository->getRdvByPeriod($today, $tomorrow);
-            
-            $result = [
-                'success' => true,
-                'type' => 'rdv_general',
-                'data' => $rdvsToday,
-                'date' => $today->format('Y-m-d'),
-                'count' => count($rdvsToday),
-                'message' => 'Rendez-vous d\'aujourd\'hui pour tous les praticiens'
             ];
             
             $response->getBody()->write(json_encode($result));
@@ -190,15 +167,6 @@ class ServiceRdv implements ServiceRdvInterface
                 return [
                     'valid' => false,
                     'message' => 'La date de début doit être antérieure ou égale à la date de fin'
-                ];
-            }
-            
-            // Vérifier que la période n'est pas trop longue (ex: max 6 mois)
-            $interval = $dateDebut->diff($dateFin);
-            if ($interval->days > 180) {
-                return [
-                    'valid' => false,
-                    'message' => 'La période ne peut pas dépasser 180 jours'
                 ];
             }
             

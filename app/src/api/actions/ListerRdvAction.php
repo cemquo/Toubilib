@@ -17,25 +17,19 @@ class ListerRdvAction
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $praticienId = $request->getAttribute('id'); // ID depuis l'URL
         $queryParams = $request->getQueryParams();
-        
-        // Si on a un praticien_id avec période, on affiche les RDV du praticien
-        if (isset($queryParams['praticien']) && !empty($queryParams['praticien']) &&
-            isset($queryParams['debutPeriode']) && !empty($queryParams['debutPeriode']) &&
-            isset($queryParams['finPeriode']) && !empty($queryParams['finPeriode'])) {
-            
+        $queryParams['praticien'] = $praticienId; // injecter l'ID dans le tableau
+
+        if (isset($queryParams['praticien'], $queryParams['debutPeriode'], $queryParams['finPeriode'])) {
             return $this->serviceRdv->getRdvPraticienPeriode($request, $response, $queryParams);
         }
-        
-        // Si on a seulement un praticien_id, on peut afficher autre chose
-        if (isset($queryParams['praticien']) && !empty($queryParams['praticien'])) {
+
+        if (isset($queryParams['praticien'])) {
             return $this->serviceRdv->getRdvPraticien($request, $response, $queryParams);
         }
-        
-        // Sinon, comportement par défaut (liste générale, autre logique...)
-        return $this->serviceRdv->getRdvGeneral($request, $response, $queryParams);
-    }
-    
-}
 
-?>
+        return $this->serviceRdv->getRdvGeneral($request, $response, $queryParams);
+
+    }
+}
