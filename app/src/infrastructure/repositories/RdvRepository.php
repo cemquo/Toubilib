@@ -4,7 +4,12 @@ namespace toubilib\infra\repositories;
 
 use PDO;
 use DateTime;
+<<<<<<< HEAD
 use toubilib\core\application\ports\api\dtos\RdvDTO;
+=======
+use Ramsey\Uuid\Uuid;
+use toubilib\core\application\ports\api\dtos\InputRendezVousDTO;
+>>>>>>> 652ea4577e36de94ed88f8c7ee1caaebc0b7ad77
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
 
 class RdvRepository implements RdvRepositoryInterface
@@ -84,6 +89,24 @@ class RdvRepository implements RdvRepositoryInterface
             error_log("Erreur SQL getRdvByPraticienAndPeriod: " . $e->getMessage());
             throw new \Exception("Erreur lors de la récupération des rendez-vous du praticien");
         }
+    }
+
+    public function create(InputRendezVousDTO $dto): void
+    {
+        $sql = "INSERT INTO rdv
+            (id, praticien_id, patient_id, patient_email, date_heure_debut, duree, motif_visite, date_creation, status)
+            VALUES (:id, :praticien_id, :patient_id, :patient_email, :date_heure_debut, :duree, :motif_visite, NOW(), 0)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'id' => Uuid::uuid4()->toString(),
+            'praticien_id' => $dto->getPraticienId(),
+            'patient_id' => $dto->getPatientId(),
+            'patient_email' => $dto->getPatientEmail(),
+            'date_heure_debut' => $dto->getDateHeureDebut()->format('Y-m-d H:i:s'),
+            'duree' => $dto->getDuree(),
+            'motif_visite' => $dto->getMotifVisite(),
+        ]);
     }
 
 }
