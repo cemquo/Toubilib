@@ -4,10 +4,12 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 use toubilib\core\application\ports\api\ServicePraticienInterface;
 use toubilib\core\application\ports\api\ServiceRdvInterface;
+use toubilib\core\application\ports\spi\repositoryInterfaces\PatientRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
 use toubilib\core\application\usecases\ServicePraticien;
 use toubilib\core\application\usecases\ServiceRdv;
+use toubilib\infra\repositories\PatientRepository;
 use toubilib\infra\repositories\PraticienRepository;
 use toubilib\infra\repositories\RdvRepository;
 
@@ -53,6 +55,10 @@ return [
     },
 
     ServiceRdvInterface::class => function($c) {
-        return new ServiceRdv($c->get(RdvRepositoryInterface::class));
+        return new ServiceRdv($c->get(RdvRepositoryInterface::class),$c->get(PraticienRepositoryInterface::class),$c->get(PatientRepositoryInterface::class));
+    },
+
+    PatientRepositoryInterface::class => function($c) {
+        return new PatientRepository($c->get('pdo.pat'));
     },
 ];

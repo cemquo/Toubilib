@@ -10,15 +10,27 @@ use Psr\Http\Message\ServerRequestInterface;
 use toubilib\core\application\ports\api\dtos\InputRendezVousDTO;
 use toubilib\core\application\ports\api\dtos\RdvDTO;
 use toubilib\core\application\ports\api\ServiceRdvInterface;
+use toubilib\core\application\ports\spi\exceptions\CreneauInvalideException;
+use toubilib\core\application\ports\spi\exceptions\MotifInvalideException;
+use toubilib\core\application\ports\spi\exceptions\PatientNonTrouveException;
+use toubilib\core\application\ports\spi\exceptions\PraticienIndisponibleException;
+use toubilib\core\application\ports\spi\exceptions\PraticienNonTrouveException;
+use toubilib\core\application\ports\spi\repositoryInterfaces\PatientRepositoryInterface;
+use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
+use toubilib\core\domain\entities\rdv\Rdv;
 
 class ServiceRdv implements ServiceRdvInterface
 {
     private RdvRepositoryInterface $rdvRepository;
+    private PraticienRepositoryInterface $praticienRepository;
+    private PatientRepositoryInterface $patientRepository;
 
-    public function __construct(RdvRepositoryInterface $rdvRepository)
+    public function __construct(RdvRepositoryInterface $rdvRepository, PraticienRepositoryInterface $praticienRepository, PatientRepositoryInterface $patientRepository)
     {
         $this->rdvRepository = $rdvRepository;
+        $this->praticienRepository = $praticienRepository;
+        $this->patientRepository = $patientRepository;
     }
 
     public function listerRdv(): array
@@ -133,7 +145,7 @@ class ServiceRdv implements ServiceRdvInterface
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
         }
     }
-    
+
     public function validatePraticienPeriod($praticienId, $debutPeriode, $finPeriode): array
     {
         // Vérifier le format UUID du praticien_id
@@ -170,7 +182,7 @@ class ServiceRdv implements ServiceRdvInterface
                     'message' => 'La date de début doit être antérieure ou égale à la date de fin'
                 ];
             }
-            
+
             // Vérifier que les dates ne sont pas trop anciennes
             $dateMin = new DateTime('-1 year');
             if ($dateDebut < $dateMin) {
@@ -216,8 +228,42 @@ class ServiceRdv implements ServiceRdvInterface
         return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $uuid);
     }
 
-    public function creerRendezVous(InputRendezVousDTO $dto)
+    public function creerRendezVous(InputRendezVousDTO $dto): void
     {
+        // Vérif 1 : praticien existe
+        $praticien = $this->praticienRepository->get($dto->getPraticienId());
+        if (!$praticien) {
+            throw new PraticienNonTrouveException("Praticien inexistant");
+        }
+
+        // Vérif 2 : patient existe
+        $patient = $this->patientRepository->findById($dto->getPatientId());
+        if (!$patient) {
+            throw new PatientNonTrouveException("Patient inexistant");
+        }
+
+        // Vérif 3 : motif valide pour ce praticien
+        if (!in_array($dto->getMotifVisite(), $praticien->getMotifVisite())) {
+            throw new MotifInvalideException("Motif invalide pour ce praticien");
+        }
+
+        // Vérif 4 : créneau valide (jour ouvré et horaires entre 8h et 19h)
+        $dateDebut = $dto->getDateHeureDebut();
+        $jour = (int)$dateDebut->format('N'); // 1=lundi, 7=dimanche
+        $heure = (int)$dateDebut->format('H');
+
+        if ($jour >= 6) {
+            throw new CreneauInvalideException("Les rendez-vous ne sont possibles que du lundi au vendredi");
+        }
+        if ($heure < 8 || $heure >= 19) {
+            throw new CreneauInvalideException("Créneau horaire invalide (doit être entre 8h et 19h)");
+        }
+
+        // Vérif 5 : praticien disponible (pas déjà un rdv sur ce créneau)
+        if (!$this->rdvRepository->isPraticienDisponible($dto->getPraticienId(), $dto->getDateHeureDebut(), $dto->getDuree())) {
+            throw new PraticienIndisponibleException("Le praticien n'est pas disponible pour ce créneau");
+        }
+
         $this->rdvRepository->create($dto);
     }
 

@@ -3,6 +3,7 @@
 namespace toubilib\infra\repositories;
 
 use PDO;
+use DateInterval;
 use DateTime;
 use toubilib\core\application\ports\api\dtos\RdvDTO;
 use Ramsey\Uuid\Uuid;
@@ -88,22 +89,56 @@ class RdvRepository implements RdvRepositoryInterface
         }
     }
 
+    public function isPraticienDisponible(string $praticienId, DateTime $dateDebut, int $dureeMinutes): bool
+    {
+        $dateFin = (clone $dateDebut)->add(new \DateInterval('PT' . $dureeMinutes . 'M'));
+
+        $sql = "SELECT id FROM rdv 
+            WHERE praticien_id = :praticien_id 
+            AND status >= 0
+            AND (
+            
+                (:date_debut >= date_heure_debut AND :date_debut < date_heure_fin)
+                OR
+                  
+                (:date_fin > date_heure_debut AND :date_fin <= date_heure_fin)
+                OR
+                
+                (:date_debut <= date_heure_debut AND :date_fin >= date_heure_fin)
+            )
+            LIMIT 1";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'praticien_id' => $praticienId,
+            'date_debut'   => $dateDebut->format('Y-m-d H:i:s'),
+            'date_fin'     => $dateFin->format('Y-m-d H:i:s')
+        ]);
+
+        $conflit = $stmt->fetch();
+        return $conflit === false;
+    }
+
     public function create(InputRendezVousDTO $dto): void
     {
+        $dateHeureDebut = $dto->getDateHeureDebut();
+        $dateHeureFin = clone $dateHeureDebut;
+        $dateHeureFin->add(new DateInterval('PT' . $dto->getDuree() . 'M'));
+
         $sql = "INSERT INTO rdv
-            (id, praticien_id, patient_id, patient_email, date_heure_debut, duree, motif_visite, date_creation, status)
-            VALUES (:id, :praticien_id, :patient_id, :patient_email, :date_heure_debut, :duree, :motif_visite, NOW(), 0)";
+            (id, praticien_id, patient_id, date_heure_debut, date_heure_fin, duree, motif_visite, date_creation, status)
+            VALUES (:id, :praticien_id, :patient_id, :date_heure_debut, :date_heure_fin, :duree, :motif_visite, :date_creation, 0)";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'id' => Uuid::uuid4()->toString(),
             'praticien_id' => $dto->getPraticienId(),
             'patient_id' => $dto->getPatientId(),
-            'patient_email' => $dto->getPatientEmail(),
             'date_heure_debut' => $dto->getDateHeureDebut()->format('Y-m-d H:i:s'),
+            'date_heure_fin' => $dateHeureFin->format('Y-m-d H:i:s'),
             'duree' => $dto->getDuree(),
             'motif_visite' => $dto->getMotifVisite(),
+            'date_creation' => date('Y-m-d 00:00:00'),
         ]);
     }
-
 }
