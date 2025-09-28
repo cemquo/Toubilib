@@ -137,4 +137,36 @@ class Rdv
             'motif_visite' => $this->motif_visite
         ];
     }
+
+    public static function fromArray(array $row): self
+    {
+        $o = new self();
+        $o->id = $row['id'];
+        $o->praticien_id = $row['praticien_id'];
+        $o->patient_id = $row['patient_id'];
+        $o->patient_email = $row['patient_email'] ?? null;
+        $o->date_heure_debut = new \DateTime($row['date_heure_debut'], new \DateTimeZone('UTC'));
+        $o->date_heure_fin = new \DateTime($row['date_heure_fin'], new \DateTimeZone('UTC'));
+        $o->duree = (int)$row['duree'];
+        $o->date_creation = new \DateTime($row['date_creation'], new \DateTimeZone('UTC'));
+        $o->motif_visite = $row['motif_visite'] ?? null;
+        $o->status = (int)$row['status'];
+        return $o;
+    }
+
+    public function annuler(): void
+    {
+        // Règles métier: ne pas annuler si déjà annulé, ni si passé/présent
+        if ($this->status === -1) {
+            throw new \toubilib\core\application\ports\spi\exceptions\RdvDejaAnnuleException("Le rendez-vous est déjà annulé");
+        }
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        if ($this->date_heure_debut <= $now) {
+            throw new \toubilib\core\application\ports\spi\exceptions\RdvPasseNonAnnulableException("Un rendez-vous passé (ou en cours) n'est pas annulable");
+        }
+
+        $this->status = -1;
+    }
+
 }

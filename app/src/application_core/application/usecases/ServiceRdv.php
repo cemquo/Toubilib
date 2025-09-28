@@ -15,6 +15,7 @@ use toubilib\core\application\ports\spi\exceptions\MotifInvalideException;
 use toubilib\core\application\ports\spi\exceptions\PatientNonTrouveException;
 use toubilib\core\application\ports\spi\exceptions\PraticienIndisponibleException;
 use toubilib\core\application\ports\spi\exceptions\PraticienNonTrouveException;
+use toubilib\core\application\ports\spi\exceptions\RendezVousNonTrouveException;
 use toubilib\core\application\ports\spi\repositoryInterfaces\PatientRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
@@ -266,5 +267,44 @@ class ServiceRdv implements ServiceRdvInterface
 
         $this->rdvRepository->create($dto);
     }
+
+    public function annulerRendezVous(string $idRdv): void
+    {
+        $row = $this->rdvRepository->findByIdRaw($idRdv);
+        if (!$row) {
+            throw new RendezVousNonTrouveException("Rendez-vous introuvable");
+        }
+
+        // Reconstitue l'entité, applique la règle métier, puis persiste
+        $rdv = Rdv::fromArray($row);
+        $rdv->annuler();
+
+        $this->rdvRepository->updateStatus($rdv->getId(), $rdv->getStatus());
+    }
+
+    public function agendaPraticien(string $praticienId, ?string $debut = null, ?string $fin = null): array
+    {
+        $dateDebut = $debut ? new DateTime($debut . ' 00:00:00', new \DateTimeZone('UTC')) : new DateTime('today', new \DateTimeZone('UTC'));
+        $dateFin   = $fin   ? new DateTime($fin   . ' 23:59:59', new \DateTimeZone('UTC')) : new DateTime('today 23:59:59', new \DateTimeZone('UTC'));
+
+        // Option: valider praticien
+        $praticien = $this->praticienRepository->get($praticienId);
+        if (!$praticien) {
+            throw new \toubilib\core\application\ports\spi\exceptions\PraticienNonTrouveException("Praticien inexistant");
+        }
+
+        // Récupération brute depuis le repo (RDV actifs uniquement)
+        $rows = $this->rdvRepository->getRdvByPraticienAndPeriod($praticienId, $dateDebut, $dateFin);
+
+        // Enrichissement: inclure un lien vers le patient (ou ses données minimales si nécessaire)
+        // Ici on renvoie les lignes telles quelles + un champ "patient_url"
+        return array_map(function(array $r) {
+            $r['patient_url'] = '/patient/' . $r['patient_id'];
+            $r['annule'] = ((int)$r['status'] === -1);
+            return $r;
+        }, $rows);
+    }
+
+
 
 }

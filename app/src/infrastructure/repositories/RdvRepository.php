@@ -141,4 +141,24 @@ class RdvRepository implements RdvRepositoryInterface
             'date_creation' => date('Y-m-d 00:00:00'),
         ]);
     }
+
+    public function findByIdRaw(string $id): ?array
+    {
+        $sql = "SELECT * FROM rdv WHERE id = :id LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function updateStatus(string $id, int $status): void
+    {
+        $sql = "UPDATE rdv SET status = :status WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'status' => $status,
+            'id' => $id
+        ]);
+    }
+
 }

@@ -8,4 +8,5 @@ interface ServiceRdvInterface
 {
     public function listerRdv(): array;
     public function creerRendezVous(InputRendezVousDTO $dto);
+    public function annulerRendezVous(string $idRdv): void;
 }

@@ -11,4 +11,7 @@ interface RdvRepositoryInterface
     public function getRdvByPraticienAndPeriod(string $praticienId, DateTime $dateDebut, DateTime $dateFin): array;
     public function isPraticienDisponible(string $praticienId, DateTime $dateDebut, int $dureeMinutes): bool;
     public function create(InputRendezVousDTO $dto): void;
+    public function findByIdRaw(string $id): ?array;
+    public function updateStatus(string $id, int $status): void;
+
 }
