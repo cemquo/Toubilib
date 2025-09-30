@@ -13,17 +13,17 @@ use toubilib\api\middlewares\CreateRdvDtoMiddleware;
 
 return function( App $app):App {
 
-    $app->get('/praticiens', ListerPraticiensAction::class);
+    $app->get('/praticiens', ListerPraticiensAction::class)->setName('ListerPraticiens');
 
-    $app->get('/praticiens/{id}', AfficherPraticienAction::class);
+    $app->get('/praticiens/{id}', AfficherPraticienAction::class)->setName('AfficherPraticien');
 
-    $app->get('/praticiens/{id}/rdv', ListerRdvAction::class);
+    $app->get('/praticiens/{id}/rdv', ListerRdvAction::class)->setName('ListerRdvPraticien');
 
-    $app->post('/rdv', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class);
+    $app->post('/rdv', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class)->setName('CreerRdv');
 
-    $app->delete('/rdv/{id}', AnnulerRdvAction::class);
+    $app->delete('/rdv/{id}', AnnulerRdvAction::class)->setName('AnnulerRdv');
 
-    $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class);
+    $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class)->setName('AgendaPraticien');
 
 
     return $app;
