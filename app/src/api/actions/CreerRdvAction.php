@@ -22,7 +22,7 @@ class CreerRdvAction
     }
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface{
-// ... existing code ...
+
         $dto = $request->getAttribute('inputRdvDto');
         if (!$dto instanceof InputRendezVousDTO) {
             $response->getBody()->write(json_encode(['error' => 'DTO de rendez-vous manquant ou invalide'], JSON_UNESCAPED_UNICODE));
@@ -41,15 +41,15 @@ class CreerRdvAction
         } catch (PraticienNonTrouveException|PatientNonTrouveException $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE));
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
-// ... existing code ...
+
         } catch (MotifInvalideException|CreneauInvalideException $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-// ... existing code ...
+
         } catch (PraticienIndisponibleException $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE));
             return $response->withStatus(409)->withHeader('Content-Type', 'application/json');
-// ... existing code ...
+
         } catch (\Throwable $e) {
             $response->getBody()->write(json_encode(['error' => 'Erreur serveur'], JSON_UNESCAPED_UNICODE));
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json');

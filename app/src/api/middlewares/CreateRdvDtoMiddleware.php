@@ -12,7 +12,6 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // Vérifie content-type
         $contentType = $request->getHeaderLine('Content-Type');
         if (stripos($contentType, 'application/json') === false) {
             return $this->jsonError($request, 400, "Content-Type attendu: application/json");
@@ -23,14 +22,12 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
             return $this->jsonError($request, 400, "Corps JSON invalide");
         }
 
-        // Liste des champs autorisés
         $allowed = ['praticien_id', 'patient_id', 'date_heure_debut', 'duree', 'motif_visite'];
         $unknown = array_diff(array_keys($payload), $allowed);
         if (!empty($unknown)) {
             return $this->jsonError($request, 400, "Champs non supportés: " . implode(', ', $unknown));
         }
 
-        // Contrôles de présence
         $required = ['praticien_id', 'patient_id', 'date_heure_debut', 'duree'];
         foreach ($required as $key) {
             if (!array_key_exists($key, $payload)) {
@@ -38,7 +35,6 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
             }
         }
 
-        // Contrôles de format
         $praticienId = (string)$payload['praticien_id'];
         $patientId   = (string)$payload['patient_id'];
         $dateStr     = (string)$payload['date_heure_debut'];
@@ -52,14 +48,12 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
             return $this->jsonError($request, 400, "patient_id doit être un UUID v4");
         }
 
-        // ISO-8601 recommandé: "YYYY-MM-DDTHH:MM:SSZ" ou avec offset
         try {
             $date = new \DateTime($dateStr);
         } catch (\Exception $e) {
             return $this->jsonError($request, 400, "date_heure_debut invalide (ISO-8601 recommandé)");
         }
 
-        // Normalisation en UTC (base de données souvent en UTC)
         $date->setTimezone(new \DateTimeZone('UTC'));
 
         if (!is_int($duree)) {
@@ -81,7 +75,6 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
             if ($motif === '') {
                 $motif = null;
             }
-            // Option: limiter la taille
             if ($motif !== null && mb_strlen($motif) > 255) {
                 return $this->jsonError($request, 400, "motif_visite ne doit pas dépasser 255 caractères");
             }
@@ -102,9 +95,8 @@ class CreateRdvDtoMiddleware implements MiddlewareInterface
     private function jsonError(ServerRequestInterface $request, int $status, string $message): ResponseInterface
     {
         $response = $request->getAttribute('response');
-        // Si non présent, on crée une réponse PSR-7 simple (selon votre stack Slim, ce sera fourni différemment)
+
         if (!$response instanceof \Psr\Http\Message\ResponseInterface) {
-            // Slim fournit en général la Response via le handler, mais au cas où:
             $factory = new \Slim\Psr7\Factory\ResponseFactory();
             $response = $factory->createResponse($status);
         } else {

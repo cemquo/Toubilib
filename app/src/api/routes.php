@@ -15,15 +15,15 @@ return function( App $app):App {
 
     $app->get('/praticiens', ListerPraticiensAction::class);
 
-    $app->get('/praticien/{id}', AfficherPraticienAction::class);
+    $app->get('/praticiens/{id}', AfficherPraticienAction::class);
 
-    $app->get('/praticien/{id}/rdv', ListerRdvAction::class);
+    $app->get('/praticiens/{id}/rdv', ListerRdvAction::class);
 
-    $app->post('/creer_rdv', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class);
+    $app->post('/rdv', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class);
 
-    $app->delete('/supp_rdv/{id}', AnnulerRdvAction::class);
+    $app->delete('/rdv/{id}', AnnulerRdvAction::class);
 
-    $app->get('/praticien/{id}/agenda', AgendaPraticienAction::class);
+    $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class);
 
 
     return $app;
