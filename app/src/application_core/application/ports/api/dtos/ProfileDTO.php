@@ -14,4 +14,8 @@ class ProfileDTO
         $this->email = $email;
         $this->role = $role;
     }
+
+    public function getId(): string { return $this->id; }
+    public function getEmail(): string { return $this->email; }
+    public function getRole(): string { return $this->role; }
 }

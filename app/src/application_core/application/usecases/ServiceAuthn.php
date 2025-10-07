@@ -2,20 +2,46 @@
 
 namespace toubilib\core\application\usecases;
 
+use Exception;
 use toubilib\core\application\ports\api\dtos\CredentialsDTO;
 use toubilib\core\application\ports\api\dtos\ProfileDTO;
 use toubilib\core\application\ports\api\ServiceAuthnInterface;
+use toubilib\core\application\ports\spi\repositoryInterfaces\AuthRepositoryInterface;
 
 class ServiceAuthn implements ServiceAuthnInterface
 {
 
-    public function register(CredentialsDTO $credentials, int $role): profileDTO
+    private AuthRepositoryInterface $userRepository;
+
+    public function __construct(AuthRepositoryInterface $userRepository)
     {
-        // TODO: Implement register() method.
+        $this->userRepository = $userRepository;
     }
 
-    public function byCredentials(CredentialsDTO $credentials): profileDTO
+    public function register(CredentialsDTO $credentials, int $role): ProfileDTO
     {
-        // TODO: Implement byCredentials() method.
+        $existing = $this->userRepository->findByEmail($credentials->email);
+        if ($existing) {
+            throw new Exception("Un utilisateur existe déjà avec cet email.");
+        }
+
+        $hashedPassword = password_hash($credentials->password, PASSWORD_BCRYPT);
+        $user = $this->userRepository->create($credentials->email, $hashedPassword, $role);
+
+        return new ProfileDTO($user->getId(), $user->getEmail(), $user->getRole());
+    }
+
+    public function byCredentials(CredentialsDTO $credentials): ProfileDTO
+    {
+        $user = $this->userRepository->findByEmail($credentials->email);
+        if (!$user) {
+            throw new Exception("Utilisateur introuvable.");
+        }
+
+        if (!password_verify($credentials->password, $user->getPassword())) {
+            throw new Exception("Mot de passe incorrect.");
+        }
+
+        return new ProfileDTO($user->getId(), $user->getEmail(), $user->getRole());
     }
 }
