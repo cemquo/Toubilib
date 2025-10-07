@@ -7,6 +7,7 @@ use DateTimeZone;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Routing\RouteContext;
 use toubilib\core\application\ports\api\dtos\InputRendezVousDTO;
 use toubilib\core\application\ports\api\dtos\RdvDTO;
 use toubilib\core\application\ports\api\ServiceRdvInterface;
@@ -109,8 +110,26 @@ class ServiceRdv implements ServiceRdvInterface
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
         }
     }
+
+    public function getRdv(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): array
+    {
+        $routeParse = RouteContext::fromRequest($request)->getRouteParser();
+        $rdv = $this->rdvRepository->getRdv($request->getAttribute('id'));
+        return [
+            'rdv' => $rdv,
+            'links' => [
+                'self' => [
+                    'href' => $routeParse->urlFor('AfficherRdv', ['id' => $request->getAttribute('id')]),
+                ],
+                'particien' => [
+                    'href' => $routeParse->urlFor('AfficherPraticien', ['id' => $rdv['praticien_id']]),
+                ]
+            ]
+        ];
+
+    }
     
-    public function getRdv(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
+    public function getRdvPraticien(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): ResponseInterface
     {
         $praticienId = $request->getAttribute('id');
         

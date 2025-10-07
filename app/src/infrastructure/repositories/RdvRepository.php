@@ -45,6 +45,26 @@ class RdvRepository implements RdvRepositoryInterface
         return $rdvs;
     }
 
+    public function getRdv(string $id): RdvDTO
+    {
+        $sql = "SELECT * FROM rdv WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return new RdvDTO(
+            $row['id'],
+            $row['praticien_id'],
+            $row['patient_id'],
+            $row['patient_email'],
+            $row['date_heure_debut'],
+            $row['status'],
+            $row['duree'],
+            $row['date_heure_fin'],
+            $row['date_creation'],
+            $row['motif_visite']
+        );
+    }
+
     public function getRdvByPraticienAndPeriod(string $praticienId, DateTime $dateDebut, DateTime $dateFin): array
     {
         try {

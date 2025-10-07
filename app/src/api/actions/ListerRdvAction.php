@@ -26,7 +26,7 @@ class ListerRdvAction
         }
 
         if (isset($queryParams['praticien'])) {
-            return $this->serviceRdv->getRdv($request, $response, $queryParams);
+            return $this->serviceRdv->getRdvPraticien($request, $response, $queryParams);
         }
 
         return $this->serviceRdv->getRdv($request, $response, $queryParams);

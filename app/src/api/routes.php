@@ -17,14 +17,15 @@ return function( App $app):App {
 
     $app->get('/praticiens/{id}', AfficherPraticienAction::class)->setName('AfficherPraticien');
 
-    $app->get('/praticiens/{id}/rdv', ListerRdvAction::class)->setName('ListerRdvPraticien');
+    $app->get('/praticiens/{id}/rdvs', ListerRdvAction::class)->setName('ListerRdvPraticien');
 
-    $app->post('/rdv', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class)->setName('CreerRdv');
+    $app->post('/rdvs', CreerRdvAction::class)->add(CreateRdvDtoMiddleware::class)->setName('CreerRdv');
 
-    $app->delete('/rdv/{id}', AnnulerRdvAction::class)->setName('AnnulerRdv');
+    $app->delete('/rdvs/{id}', AnnulerRdvAction::class)->setName('AnnulerRdv');
 
     $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class)->setName('AgendaPraticien');
 
+    $app->get('/rdvs/{id}', ListerRdvAction::class)->setName('AfficherRdv');
 
     return $app;
 };

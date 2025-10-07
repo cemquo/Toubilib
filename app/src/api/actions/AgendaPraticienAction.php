@@ -9,7 +9,10 @@ use toubilib\core\application\ports\spi\exceptions\PraticienNonTrouveException;
 
 class AgendaPraticienAction
 {
-    public function __construct(private ServiceRdvInterface $serviceRdv) {}
+    private ServiceRdvInterface $serviceRdv;
+    public function __construct(ServiceRdvInterface $serviceRdv) {
+        $this->serviceRdv = $serviceRdv;
+    }
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args = []): ResponseInterface
     {
