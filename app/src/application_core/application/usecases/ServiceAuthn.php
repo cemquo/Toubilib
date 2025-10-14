@@ -44,4 +44,18 @@ class ServiceAuthn implements ServiceAuthnInterface
 
         return new ProfileDTO($user->getId(), $user->getEmail(), $user->getRole());
     }
+
+    public function signin(CredentialsDTO $credentials): ProfileDTO
+    {
+        $user = $this->userRepository->findByEmail($credentials->email);
+        if (!$user) {
+            throw new Exception("Utilisateur introuvable.");
+        }
+
+        if (!password_verify($credentials->password, $user->getPassword())) {
+            throw new Exception("Mot de passe incorrect.");
+        }
+
+        return new ProfileDTO($user->getId(), $user->getEmail(), $user->getRole());
+    }
 }

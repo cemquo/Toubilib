@@ -8,6 +8,7 @@ use toubilib\api\actions\AnnulerRdvAction;
 use toubilib\api\actions\CreerRdvAction;
 use toubilib\api\actions\ListerPraticiensAction;
 use toubilib\api\actions\ListerRdvAction;
+use toubilib\api\actions\SigninAction;
 use toubilib\api\middlewares\CreateRdvDtoMiddleware;
 
 
@@ -26,6 +27,8 @@ return function( App $app):App {
     $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class)->setName('AgendaPraticien');
 
     $app->get('/rdvs/{id}', ListerRdvAction::class)->setName('AfficherRdv');
+
+    $app->post('/signin', SigninAction::class)->setName('Signin');
 
     return $app;
 };
