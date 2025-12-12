@@ -13,8 +13,9 @@ class PatientDTO
     public ?string $ville;
     public ?string $email;
     public string $telephone;
+    public string $password;
 
-    public function __construct(string $id, string $nom, string $prenom, ?string $dateNaissance, ?string $adresse, ?string $codePostal, ?string $ville, ?string $email, string $telephone) {
+    public function __construct(string $id, string $nom, string $prenom, ?string $dateNaissance, ?string $adresse, ?string $codePostal, ?string $ville, ?string $email, string $telephone, string $password) {
         $this->id = $id;
         $this->nom = $nom;
         $this->prenom = $prenom;
@@ -24,5 +25,6 @@ class PatientDTO
         $this->ville = $ville;
         $this->email = $email;
         $this->telephone = $telephone;
+        $this->password = $password;
     }
 }

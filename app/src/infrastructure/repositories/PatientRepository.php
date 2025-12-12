@@ -46,4 +46,26 @@ class PatientRepository implements PatientRepositoryInterface
             throw new PatientNonTrouveException($e->getMessage());
         }
     }
+
+    public function createPatient(Patient $patient): void
+    {
+        try {
+            $sql = "INSERT INTO patient (id, nom, prenom, date_naissance, adresse, code_postal, ville, email, telephone) 
+                        VALUES (:id, :nom, :prenom, :date_naissance, :adresse, :code_postal, :ville, :email, :telephone)";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':id', $patient->getId());
+            $stmt->bindValue(':nom', $patient->getNom());
+            $stmt->bindValue(':prenom', $patient->getPrenom());
+            $stmt->bindValue(':date_naissance', $patient->getDateNaissance() ? $patient->getDateNaissance()->format('Y-m-d') : null);
+            $stmt->bindValue(':adresse', $patient->getAdresse());
+            $stmt->bindValue(':code_postal', $patient->getCodePostal());
+            $stmt->bindValue(':ville', $patient->getVille());
+            $stmt->bindValue(':email', $patient->getEmail());
+            $stmt->bindValue(':telephone', $patient->getTelephone());
+            $stmt->execute();
+        } catch (\PDOException $e) {
+            throw new PatientNonTrouveException($e->getMessage());
+        }   
+    }
 }
