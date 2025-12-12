@@ -32,21 +32,6 @@ class RdvRepository implements RdvRepositoryInterface
             $rdvs = [];
             foreach ($rows as $row) {
 
-<<<<<<< HEAD
-            $rdvs[] = new RdvDTO(
-                $row['id'],
-                $row['praticien_id'],
-                $row['patient_id'],
-                $row['patient_email'],
-                $row['date_heure_debut'],
-                $row['status'],
-                $row['duree'],
-                $row['date_heure_fin'],
-                $row['date_creation'],
-                $row['motif_visite']
-            );
-        }
-=======
                 $rdvs[] = new RdvDTO(
                     $row['id'],
                     $row['praticien_id'],
@@ -61,7 +46,6 @@ class RdvRepository implements RdvRepositoryInterface
                 );
             }
             return $rdvs;
->>>>>>> c04c9fe2158b82a095cc05ebe6c124895f7e39a0
 
         } catch (\PDOException $e) {
             throw new FindAllRdvException("Erreur lors de la récupération de tous les rdvs");
