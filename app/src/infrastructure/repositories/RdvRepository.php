@@ -15,7 +15,8 @@ class RdvRepository implements RdvRepositoryInterface
 
     private \PDO $pdo;
 
-    public function __construct(\PDO $pdo) {
+    public function __construct(\PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
@@ -28,19 +29,19 @@ class RdvRepository implements RdvRepositoryInterface
         $rdvs = [];
         foreach ($rows as $row) {
 
-        $rdvs[] = new RdvDTO(
-            $row['id'],
-            $row['praticien_id'],
-            $row['patient_id'],
-            $row['patient_email'],
-            $row['date_heure_debut'],
-            $row['status'],
-            $row['duree'],
-            $row['date_heure_fin'],
-            $row['date_creation'],
-            $row['motif_visite']
-        );
-    }
+            $rdvs[] = new RdvDTO(
+                $row['id'],
+                $row['praticien_id'],
+                $row['patient_id'],
+                $row['patient_email'],
+                $row['date_heure_debut'],
+                $row['status'],
+                $row['duree'],
+                $row['date_heure_fin'],
+                $row['date_creation'],
+                $row['motif_visite']
+            );
+        }
 
         return $rdvs;
     }
@@ -78,8 +79,8 @@ class RdvRepository implements RdvRepositoryInterface
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 'praticien_id' => $praticienId,
-                'date_debut'   => $dateDebut->format('Y-m-d H:i:s'),
-                'date_fin'     => $dateFin->format('Y-m-d H:i:s')
+                'date_debut' => $dateDebut->format('Y-m-d H:i:s'),
+                'date_fin' => $dateFin->format('Y-m-d H:i:s')
             ]);
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -131,8 +132,8 @@ class RdvRepository implements RdvRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'praticien_id' => $praticienId,
-            'date_debut'   => $dateDebut->format('Y-m-d H:i:s'),
-            'date_fin'     => $dateFin->format('Y-m-d H:i:s')
+            'date_debut' => $dateDebut->format('Y-m-d H:i:s'),
+            'date_fin' => $dateFin->format('Y-m-d H:i:s')
         ]);
 
         $conflit = $stmt->fetch();
@@ -181,4 +182,28 @@ class RdvRepository implements RdvRepositoryInterface
         ]);
     }
 
+    public function getRdvByPatient(string $patientId): array
+    {
+        $sql = "SELECT * FROM rdv WHERE patient_id = :patient_id ORDER BY date_heure_debut DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['patient_id' => $patientId]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $rdvs = [];
+        foreach ($rows as $row) {
+            $rdvs[] = new RdvDTO(
+                $row['id'],
+                $row['praticien_id'],
+                $row['patient_id'],
+                $row['patient_email'],
+                $row['date_heure_debut'],
+                $row['status'],
+                $row['duree'],
+                $row['date_heure_fin'],
+                $row['date_creation'],
+                $row['motif_visite']
+            );
+        }
+        return $rdvs;
+    }
 }

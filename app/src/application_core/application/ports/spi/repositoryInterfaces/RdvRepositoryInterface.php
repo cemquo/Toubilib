@@ -12,6 +12,7 @@ interface RdvRepositoryInterface
     public function isPraticienDisponible(string $praticienId, DateTime $dateDebut, int $dureeMinutes): bool;
     public function create(InputRendezVousDTO $dto): void;
     public function findByIdRaw(string $id): ?array;
+    public function getRdv(string $id): \toubilib\core\application\ports\api\dtos\RdvDTO;
     public function updateStatus(string $id, int $status): void;
-
+    public function getRdvByPatient(string $patientId): array;
 }

@@ -11,7 +11,7 @@ use toubilib\api\actions\ListerRdvAction;
 use toubilib\api\middlewares\CreateRdvDtoMiddleware;
 
 
-return function( App $app):App {
+return function (App $app): App {
 
     $app->get('/praticiens', ListerPraticiensAction::class)->setName('ListerPraticiens');
 
@@ -26,6 +26,8 @@ return function( App $app):App {
     $app->get('/praticiens/{id}/agenda', AgendaPraticienAction::class)->setName('AgendaPraticien');
 
     $app->get('/rdvs/{id}', ListerRdvAction::class)->setName('AfficherRdv');
+
+    $app->get('/patients/{id}/rdvs', \toubilib\api\actions\ListerRdvPatientAction::class)->setName('ListerRdvPatient');
 
     return $app;
 };
