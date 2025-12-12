@@ -1,6 +1,6 @@
 <?php
 
-namespace toubilib\core\domain\entities\rdv;
+namespace toubilib\core\domain\entities;
 
 use DateTime;
 use Ramsey\Uuid\Uuid;
@@ -140,7 +140,7 @@ class Rdv
 
     public static function fromArray(array $row): self
     {
-        $o = new self();
+        $o = new self('', '', new \DateTime(), 0);
         $o->id = $row['id'];
         $o->praticien_id = $row['praticien_id'];
         $o->patient_id = $row['patient_id'];
@@ -167,6 +167,22 @@ class Rdv
         }
 
         $this->status = -1;
+    }
+
+    public function honorer(): void
+    {
+        if ($this->status === -1) {
+             throw new \toubilib\core\application\ports\spi\exceptions\RdvDejaAnnuleException("Impossible d'honorer un rendez-vous annulé");
+        }
+        $this->status = 1;
+    }
+
+    public function nePasHonorer(): void
+    {
+        if ($this->status === -1) {
+             throw new \toubilib\core\application\ports\spi\exceptions\RdvDejaAnnuleException("Impossible de marquer non honoré un rendez-vous annulé");
+        }
+        $this->status = 2;
     }
 
 }

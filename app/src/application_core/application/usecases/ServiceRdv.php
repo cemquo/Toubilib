@@ -20,7 +20,7 @@ use toubilib\core\application\ports\spi\exceptions\RendezVousNonTrouveException;
 use toubilib\core\application\ports\spi\repositoryInterfaces\PatientRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\PraticienRepositoryInterface;
 use toubilib\core\application\ports\spi\repositoryInterfaces\RdvRepositoryInterface;
-use toubilib\core\domain\entities\rdv\Rdv;
+use toubilib\core\domain\entities\Rdv;
 
 class ServiceRdv implements ServiceRdvInterface
 {
@@ -343,5 +343,31 @@ class ServiceRdv implements ServiceRdvInterface
                 $rdv->getMotifVisite()
             );
         }, $rdvs);
+    }
+
+    public function marquerRdvHonore(string $idRdv): void
+    {
+        $row = $this->rdvRepository->findByIdRaw($idRdv);
+        if (!$row) {
+            throw new RendezVousNonTrouveException("Rendez-vous introuvable");
+        }
+
+        $rdv = Rdv::fromArray($row);
+        $rdv->honorer();
+
+        $this->rdvRepository->updateStatus($rdv->getId(), $rdv->getStatus());
+    }
+
+    public function marquerRdvNonHonore(string $idRdv): void
+    {
+        $row = $this->rdvRepository->findByIdRaw($idRdv);
+        if (!$row) {
+            throw new RendezVousNonTrouveException("Rendez-vous introuvable");
+        }
+
+        $rdv = Rdv::fromArray($row);
+        $rdv->nePasHonorer();
+
+        $this->rdvRepository->updateStatus($rdv->getId(), $rdv->getStatus());
     }
 }

@@ -14,4 +14,6 @@ interface ServiceRdvInterface
     public function agendaPraticien(string $praticienId, ?string $debut = null, ?string $fin = null): array;
     public function listerRdvPatient(string $patientId): array;
     public function getRdv(ServerRequestInterface $request, ResponseInterface $response, array $queryParams): array;
+    public function marquerRdvHonore(string $idRdv): void;
+    public function marquerRdvNonHonore(string $idRdv): void;
 }
